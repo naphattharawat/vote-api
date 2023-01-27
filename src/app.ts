@@ -11,8 +11,6 @@ import * as HttpStatus from 'http-status-codes';
 import * as express from 'express';
 import * as cors from 'cors';
 
-import Knex = require('knex');
-import { MySqlConnectionConfig } from 'knex';
 import { Router, Request, Response, NextFunction } from 'express';
 import { Jwt } from './models/jwt';
 
@@ -40,7 +38,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(cors());
 
-let connection: MySqlConnectionConfig = {
+import { Knex, knex } from 'knex'
+let connection: Knex.MySqlConnectionConfig = {
   host: process.env.DB_HOST,
   port: +process.env.DB_PORT,
   database: process.env.DB_NAME,
@@ -50,7 +49,7 @@ let connection: MySqlConnectionConfig = {
   debug: true
 }
 
-let db = Knex({
+let db = require('knex')({
   client: 'mysql',
   connection: connection,
   pool: {
@@ -70,12 +69,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 let checkAuth = (req: Request, res: Response, next: NextFunction) => {
-  let token: string = null;
+  let token: any = '';
 
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
     token = req.headers.authorization.split(' ')[1];
   } else if (req.query && req.query.token) {
-    token = req.query.token;
+    token = req.query.token
   } else {
     token = req.body.token;
   }
