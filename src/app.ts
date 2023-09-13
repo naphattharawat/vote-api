@@ -50,7 +50,7 @@ let connection: Knex.MySqlConnectionConfig = {
 }
 
 let db = require('knex')({
-  client: 'mysql',
+  client: 'mysql2',
   connection: connection,
   pool: {
     min: 0,
