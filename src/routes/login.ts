@@ -20,16 +20,12 @@ router.post('/mymoph', async (req: Request, res: Response) => {
   try {
     // let encPassword = crypto.createHash('md5').update(password).digest('hex');
     let rs: any = await loginModel.loginMyMOPH(code);
-    console.log(rs);
-    console.log(rs.body.access_token);
-
     if (rs.body.access_token) {
       const info: any = await loginModel.getProfileMyMOPH(rs.body.access_token);
-      console.log(info);
-
-      if (info.ok) {
+      if (info.body.ok) {
         const obj = {
-          cid: info.user.CID
+          cid: info.body.user.CID,
+          name: `${info.body.user.FirstName} ${info.body.user.LastName}`
         }
         let token = jwt.sign(obj);
         res.send({ ok: true, token: token });
@@ -54,7 +50,8 @@ router.post('/thaid', async (req: Request, res: Response) => {
       if (rs.statusCode == 200) {
         if (rs.body.pid) {
           const obj = {
-            cid: rs.body.pid
+            cid: rs.body.pid,
+            name: rs.body.name
           }
           let token = jwt.sign(obj);
           res.send({ ok: true, token: token });
