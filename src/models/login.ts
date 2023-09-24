@@ -29,7 +29,6 @@ export class Login {
   }
 
   getProfileMyMOPH(token) {
-    const request = require('request');
     const options = {
       method: 'GET',
       url: 'https://members.moph.go.th/api/v1/info',
