@@ -46,7 +46,7 @@ router.post('/thaid', async (req: Request, res: Response) => {
   try {
     if (code && state) {
       const rs: any = await loginModel.loginThaid(code);
-      // console.log('requestToken', rs);
+      console.log('requestToken', rs);
       if (rs.statusCode == 200) {
         if (rs.body.pid) {
           const obj = {
