@@ -21,9 +21,12 @@ router.post('/mymoph', async (req: Request, res: Response) => {
     // let encPassword = crypto.createHash('md5').update(password).digest('hex');
     let rs: any = await loginModel.loginMyMOPH(code);
     console.log(rs);
+    console.log(rs.body.access_token);
 
     if (rs.body.access_token) {
       const info: any = await loginModel.getProfileMyMOPH(rs.body.access_token);
+      console.log(info);
+
       if (info.ok) {
         const obj = {
           cid: info.user.CID
