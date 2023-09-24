@@ -14,32 +14,64 @@ const jwt = new Jwt();
 
 const router: Router = Router();
 
-router.post('/customer', async (req: Request, res: Response) => {
-  let username: string = req.body.username;
-  let password: string = req.body.password;
-
+router.post('/mymoph', async (req: Request, res: Response) => {
+  let code: string = req.body.code;
   let db = req.db;
-
   try {
-    let encPassword = crypto.createHash('md5').update(password).digest('hex');
-    let rs: any = await loginModel.login(db, username, encPassword);
+    // let encPassword = crypto.createHash('md5').update(password).digest('hex');
+    let rs: any = await loginModel.loginMyMOPH(code);
+    console.log(rs);
 
-    if (rs.length) {
-
-      let payload = {
-        fullname: `${rs[0].first_name} ${rs[0].last_name}`,
-        id: rs[0].user_id,
+    if (rs.body.access_token) {
+      const info: any = await loginModel.getProfileMyMOPH(rs.body.access_token);
+      if (info.ok) {
+        const obj = {
+          cid: info.user.CID
+        }
+        let token = jwt.sign(obj);
+        res.send({ ok: true, token: token });
+      } else {
+        res.send({ ok: false, error: 'Login failed!', code: HttpStatus.UNAUTHORIZED });
       }
-
-      let token = jwt.sign(payload);
-      res.send({ ok: true, token: token, code: HttpStatus.OK });
     } else {
       res.send({ ok: false, error: 'Login failed!', code: HttpStatus.UNAUTHORIZED });
     }
   } catch (error) {
     res.send({ ok: false, error: error.message, code: HttpStatus.INTERNAL_SERVER_ERROR });
   }
+});
 
+router.post('/thaid', async (req: Request, res: Response) => {
+  const code = req.body.code;
+  const state = req.body.state;
+  try {
+    if (code && state) {
+      const rs: any = await loginModel.loginThaid(code);
+      // console.log('requestToken', rs);
+      if (rs.statusCode == 200) {
+        if (rs.body.pid) {
+          const obj = {
+            cid: rs.body.pid
+          }
+          let token = jwt.sign(obj);
+          res.send({ ok: true, token: token });
+        } else {
+          res.status(500);
+          res.send({ ok: false, error: 'ไม่พบข้อมูล' })
+        }
+      } else {
+        res.status(500);
+        res.send({ ok: false, error: 'get result ไม่ได้' })
+      }
+    } else {
+      res.status(500);
+      res.send({ ok: false, error: 'ไม่พบ sessionId' })
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500);
+    res.send({ ok: false, error: error.message })
+  }
 });
 
 export default router;

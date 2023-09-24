@@ -44,9 +44,9 @@ let connection: Knex.MySqlConnectionConfig = {
   port: +process.env.DB_PORT,
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  password: decodeURIComponent(process.env.DB_PASSWORD),
   multipleStatements: true,
-  debug: true
+  debug: false
 }
 
 let db = require('knex')({
@@ -93,7 +93,8 @@ let checkAuth = (req: Request, res: Response, next: NextFunction) => {
 }
 
 app.use('/login', loginRoute);
-app.use('/api', checkAuth, requestRoute);
+// app.use('/vote', requestRoute);
+app.use('/vote', checkAuth, requestRoute);
 app.use('/', indexRoute);
 
 //error handlers

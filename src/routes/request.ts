@@ -11,32 +11,40 @@ import { RequestModel } from '../models/request';
 const requestModel = new RequestModel();
 const router: Router = Router();
 
-router.get('/request', (req: Request, res: Response) => {
-  res.send({ ok: true, message: 'Welcome to Api Server!', code: HttpStatus.OK });
+
+router.get('/candidate', async (req: Request, res: Response) => {
+  try {
+    const rs: any = await requestModel.getCandidate(req.db);
+    res.send({ ok: true, rows: rs });
+  } catch (error) {
+    res.send({ ok: false, error: error.message, code: HttpStatus.OK });
+  }
 });
 
-// save new request
-router.post('/request', async (req: Request, res: Response) => {
-  let code = moment().format('x');
-  let cause = req.body.cause;
-  let customerId = req.decoded.id;
-  let requestDate = moment().format('YYYY-MM-DD');
-  let requestTime = moment().format('HH:mm:ss');
-
-  let data: any = {};
-  data.request_code = code;
-  data.request_cause = cause;
-  data.customer_id = customerId;
-  data.request_date = requestDate;
-  data.request_time = requestTime;
-
+router.get('/single', async (req: Request, res: Response) => {
   try {
-    await requestModel.saveRequest(req.db, data);
+    const rs: any = await requestModel.getVote(req.db, req.decoded.cid);
+    if(rs.length){
+      res.send({ ok: true, rows: rs });
+    }else{
+      res.send({ ok: true, rows: [] });
+    }
+  } catch (error) {
+    res.send({ ok: false, error: error.message, code: HttpStatus.OK });
+  }
+});
+
+router.post('/single', async (req: Request, res: Response) => {
+  const id = req.body.id;
+  try {
+    await requestModel.saveVote(req.db, {
+      cid: req.decoded.cid,
+      candidate_id: id
+    });
     res.send({ ok: true, code: HttpStatus.OK });
   } catch (error) {
     res.send({ ok: false, error: error.message, code: HttpStatus.OK });
   }
-
 });
 
 export default router;
