@@ -24,15 +24,17 @@ router.get('/candidate', async (req: Request, res: Response) => {
 router.get('/single', async (req: Request, res: Response) => {
   try {
     const rs: any = await requestModel.getVote(req.db, req.decoded.cid);
-    if(rs.length){
+    if (rs.length) {
       res.send({ ok: true, rows: rs });
-    }else{
+    } else {
       res.send({ ok: true, rows: [] });
     }
   } catch (error) {
     res.send({ ok: false, error: error.message, code: HttpStatus.OK });
   }
 });
+
+
 
 router.post('/single', async (req: Request, res: Response) => {
   const id = req.body.id;
