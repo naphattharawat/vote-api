@@ -5,6 +5,10 @@ export class RequestModel {
   getCandidate(db: Knex.QueryInterface) {
     return db.table('candidate').orderBy('id');
   }
+
+  updateCandidate(db: Knex.QueryInterface, id, url) {
+    return db.table('candidate').where('id', id).update({ 'image': url });
+  }
   getVote(db: Knex.QueryInterface, cid) {
     return db.table('single').where('cid', cid);
   }
@@ -49,7 +53,7 @@ export class RequestModel {
   }
   scoreTeam(db: any) {
     return db.table('team as t')
-      .select('t.*',db.raw('sum(score_head+score_team) as score')).sum('score_head as score_head').sum('score_team as score_team')
+      .select('t.*', db.raw('sum(score_head+score_team) as score')).sum('score_head as score_head').sum('score_team as score_team')
       .orderBy('score', 'desc')
       .groupBy('t.name')
   }

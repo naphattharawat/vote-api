@@ -113,4 +113,15 @@ router.get('/score/team', async (req: Request, res: Response) => {
     res.send({ ok: false, error: error.message, code: HttpStatus.OK });
   }
 });
+
+router.put('/img', async (req: Request, res: Response) => {
+  const id = req.body.id;
+  const url = req.body.url;
+  try {
+    await requestModel.updateCandidate(req.db, id, url);
+    res.send({ ok: true });
+  } catch (error) {
+    res.send({ ok: false, error: error.message, code: HttpStatus.OK });
+  }
+});
 export default router;
